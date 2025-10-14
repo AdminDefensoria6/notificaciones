@@ -23,8 +23,7 @@
     th{background-color:#f4f6f7;}
     tr:hover{background-color:#f1f9ff;}
     .acciones{display:flex;gap:10px;}
-    .btn-editar{background-color:#27ae60;color:white;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;}
-    .btn-eliminar{background-color:#e74c3c;color:white;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;}
+    .btn-editar{background-color:#1e8449;color:white;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;}
     .badge{padding:6px 10px;border-radius:5px;color:white;font-weight:bold;display:inline-block;text-align:center;min-width:80px;}
     .baja{background-color:#7f8c8d;}
     .media{background-color:#e67e22;}
@@ -48,18 +47,6 @@
     .prioridad-btn.activa{opacity:1;}
     .alerta{position:fixed;bottom:20px;right:20px;background:#2ecc71;color:white;padding:12px 20px;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,0.2);}
     .acciones-superiores{display:flex;justify-content:space-between;margin-bottom:15px;}
-    .btn-imprimir{background-color:#27ae60;}
-    
-    /* Alerta de confirmación de eliminación */
-    .modal-confirmacion{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);justify-content:center;align-items:center;z-index:1000;}
-    .modal-confirmacion.activa{display:flex;}
-    .modal-confirmacion-contenido{background:white;padding:25px;border-radius:8px;max-width:450px;width:90%;box-shadow:0 5px 20px rgba(0,0,0,0.3);text-align:center;}
-    .modal-confirmacion-header{color:#e74c3c;margin-bottom:15px;}
-    .modal-confirmacion-header h2{font-size:1.5rem;margin-bottom:5px;}
-    .modal-confirmacion-body{margin-bottom:25px;font-size:1.1rem;color:#555;}
-    .modal-confirmacion-footer{display:flex;justify-content:center;gap:15px;}
-    .btn-confirmar{background-color:#e74c3c;color:white;padding:10px 25px;border:none;border-radius:6px;cursor:pointer;font-size:1rem;font-weight:600;}
-    .btn-cancelar{background-color:#7f8c8d;color:white;padding:10px 25px;border:none;border-radius:6px;cursor:pointer;font-size:1rem;font-weight:600;}
     
     @media print {
         body * { visibility: hidden; }
@@ -84,7 +71,7 @@
     <h2>Listado de notificaciones electrónicas</h2>
     <div>
       <button class="btn" id="btnNuevo" style="background-color:#2980b9;">Nuevo Registro</button>
-      <button class="btn btn-imprimir" id="btnImprimir" style="background-color:#27ae60;">Imprimir Lista</button>
+      <button class="btn" id="btnImprimir" style="background-color:#1e8449;">Imprimir Lista</button>
       <button class="btn" id="btnCerrar" style="background-color:#e74c3c;">Cerrar</button>
     </div>
   </div>
@@ -162,23 +149,6 @@
   </div>
 </div>
 
-<!-- Modal de confirmación de eliminación -->
-<div class="modal-confirmacion" id="modalConfirmacion">
-  <div class="modal-confirmacion-contenido">
-    <div class="modal-confirmacion-header">
-      <h2>⚠️ Eliminar Registro</h2>
-    </div>
-    <div class="modal-confirmacion-body">
-      <p>¿Está seguro de que desea eliminar este registro?</p>
-      <p><strong>Esta acción no se puede deshacer.</strong></p>
-    </div>
-    <div class="modal-confirmacion-footer">
-      <button class="btn-cancelar" id="btnCancelarEliminacion">Cancelar</button>
-      <button class="btn-confirmar" id="btnConfirmarEliminacion">Eliminar</button>
-    </div>
-  </div>
-</div>
-
 <div id="alerta" class="alerta" style="display:none;"></div>
 
 <!-- Firebase -->
@@ -189,8 +159,7 @@ import {
   collection, 
   addDoc, 
   getDocs, 
-  updateDoc, 
-  deleteDoc, 
+  updateDoc,
   doc 
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
@@ -223,14 +192,12 @@ let notificaciones = [];
 let notificacionesFiltradas = [];
 let paginaActual = 1;
 let editandoId = null;
-let idParaEliminar = null;
 const registrosPorPagina = 10;
 
 // Elementos DOM
 const inicio = document.getElementById('inicio');
 const admin = document.getElementById('admin');
 const modal = document.getElementById('modalRegistro');
-const modalConfirmacion = document.getElementById('modalConfirmacion');
 const tablaCuerpo = document.getElementById('tablaCuerpo');
 const paginacion = document.getElementById('paginacion');
 const alerta = document.getElementById('alerta');
@@ -253,10 +220,6 @@ document.getElementById('modalCerrar').onclick = cerrarModal;
 document.getElementById('btnCancelar').onclick = cerrarModal;
 document.getElementById('formRegistro').onsubmit = guardarRegistro;
 document.getElementById('btnImprimir').onclick = () => window.print();
-
-// Event listeners para el modal de confirmación
-document.getElementById('btnCancelarEliminacion').onclick = cerrarModalConfirmacion;
-document.getElementById('btnConfirmarEliminacion').onclick = confirmarEliminacion;
 
 // Filtros
 document.getElementById('filtroTexto').addEventListener('input', aplicarFiltros);
@@ -359,31 +322,6 @@ function cerrarModal() {
   editandoId = null;
 }
 
-// Funciones para el modal de confirmación de eliminación
-function abrirModalConfirmacion(id) {
-  idParaEliminar = id;
-  modalConfirmacion.classList.add('activa');
-}
-
-function cerrarModalConfirmacion() {
-  modalConfirmacion.classList.remove('activa');
-  idParaEliminar = null;
-}
-
-async function confirmarEliminacion() {
-  if (idParaEliminar) {
-    try {
-      await deleteDoc(doc(db, 'causas', idParaEliminar));
-      mostrarAlerta('Registro eliminado correctamente');
-      cargarDatos();
-    } catch(error) {
-      console.error("Error al eliminar:", error);
-      mostrarAlerta('Error al eliminar el registro: ' + error.message, '#e74c3c');
-    }
-    cerrarModalConfirmacion();
-  }
-}
-
 async function guardarRegistro(e) {
   e.preventDefault();
   
@@ -422,16 +360,12 @@ async function guardarRegistro(e) {
   }
 }
 
-// Funciones globales para editar y eliminar
+// Funciones globales para editar
 window.editarRegistro = function(id) {
   const notificacion = notificaciones.find(n => n.id === id);
   if (notificacion) {
     abrirModal(notificacion);
   }
-};
-
-window.eliminarRegistro = function(id) {
-  abrirModalConfirmacion(id);
 };
 
 async function cargarDatos() {
@@ -497,7 +431,6 @@ function renderTabla() {
         <td><span class="badge ${(notif.prioridad || '').toLowerCase()}">${notif.prioridad || ''}</span></td>
         <td class="acciones">
           <button class="btn-editar" onclick="editarRegistro('${notif.id}')">Editar</button>
-          <button class="btn-eliminar" onclick="eliminarRegistro('${notif.id}')">Eliminar</button>
         </td>
       </tr>
     `).join('');
