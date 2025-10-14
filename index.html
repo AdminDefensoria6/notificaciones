@@ -23,7 +23,7 @@
     th{background-color:#f4f6f7;}
     tr:hover{background-color:#f1f9ff;}
     .acciones{display:flex;gap:10px;}
-    .btn-editar{background-color:#f39c12;color:white;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;}
+    .btn-editar{background-color:#27ae60;color:white;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;}
     .btn-eliminar{background-color:#e74c3c;color:white;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;}
     .badge{padding:6px 10px;border-radius:5px;color:white;font-weight:bold;display:inline-block;text-align:center;min-width:80px;}
     .baja{background-color:#7f8c8d;}
@@ -83,13 +83,13 @@
   <div class="header-admin">
     <h2>Listado de notificaciones electrónicas</h2>
     <div>
-      <button class="btn" id="btnNuevo">Nuevo Registro</button>
+      <button class="btn" id="btnNuevo" style="background-color:#2980b9;">Nuevo Registro</button>
+      <button class="btn btn-imprimir" id="btnImprimir" style="background-color:#27ae60;">Imprimir Lista</button>
       <button class="btn" id="btnCerrar" style="background-color:#e74c3c;">Cerrar</button>
     </div>
   </div>
 
   <div class="acciones-superiores">
-    <button class="btn btn-imprimir" id="btnImprimir">Imprimir Lista</button>
     <div id="contadorRegistros">Total de registros: 0</div>
   </div>
 
@@ -155,8 +155,8 @@
         <input type="hidden" id="prioridadNotificacion" required>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn" id="btnCancelar">Cancelar</button>
-        <button type="submit" class="btn">Guardar</button>
+        <button type="button" class="btn" id="btnCancelar" style="background-color:#e74c3c;">Cancelar</button>
+        <button type="submit" class="btn" style="background-color:#3498db;">Guardar</button>
       </div>
     </form>
   </div>
