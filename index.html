@@ -87,7 +87,7 @@
     <div class="filtro-grupo"><label>Juzgado</label><select id="filtroJuzgado"></select></div>
     <div class="filtro-grupo"><label>Tipo</label><select id="filtroTipo">
       <option value="">Todos</option>
-      <option>Citación</option>
+      <option>Providencia</option>
       <option>Resolución</option>
       <option>Sentencia</option>
     </select></div>
@@ -131,7 +131,7 @@
       <div class="form-grupo"><label>Juzgado</label><select id="juzgado" required></select></div>
       <div class="form-grupo"><label>Responsable</label><select id="responsable" required></select></div>
       <div class="form-grupo"><label>Tipo</label><select id="tipoNotificacion" required>
-        <option value="">Seleccione...</option><option>Citación</option><option>Resolución</option><option>Sentencia</option></select></div>
+        <option value="">Seleccione...</option><option>Providencia</option><option>Resolución</option><option>Sentencia</option></select></div>
       <div class="form-grupo"><label>Prioridad</label>
         <div class="prioridad-opciones" id="grupoPrioridad">
           <button type="button" class="prioridad-btn baja" style="background-color:#7f8c8d">Baja</button>
@@ -151,7 +151,6 @@
 
 <div id="alerta" class="alerta" style="display:none;"></div>
 
-<!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { 
@@ -178,7 +177,9 @@ const db = getFirestore(app);
 const responsables = ["Bazante Nadia Romina","Cardozo Maria Raquel","Cedron Noelia Aurora","Corrales Alicia Mariela","Escobar Monica Graciela","Fioravante Romulo","Gonzalez Alberto Misael","Gonzalez Juan Jose","Gudiño Natalia Esther","Magnani Enzo Luciano","Pablos Patricia","Palacios Ana Gabriela","Ramos Marcelo Gustavo","Riveros Patricia Soledad","Sosa Rita Cecilia"];
 
 const juzgados = {
-  "Administrativo": ["CEJUME - Posadas","DEUT Defensorias - Posadas","Legajo Defensoria Civil y Comercial N° 6"],
+"Tercera Instancia":["SUPERIOR TRIBUNAL DE JUSTICIA"],
+"Segunda Instancia":["CÁMARA DE APELACIONES EN LO CIVIL, COMERCIAL, DE FAMILIA Y FISCAL TRIBUTARIA -Sala I","CÁMARA DE APELACIONES EN LO CIVIL, COMERCIAL, DE FAMILIA Y FISCAL TRIBUTARIA-Sala II", "CÁMARA DE APELACIONES EN LO CIVIL, COMERCIAL, DE FAMILIA Y FISCAL TRIBUTARIA -Sala III", "CÁMARA DE APELACIONES EN LO CIVIL, COMERCIAL, DE FAMILIA Y FISCAL TRIBUTARIA -Sala IV", "CÁMARA DE APELACIONES EN LO CIVIL, COMERCIAL, DE FAMILIA Y FISCAL TRIBUTARIA -Sala V"],
+"Administrativo": ["CEJUME - Posadas","DEUT Defensorias - Posadas","Legajo Defensoria Civil y Comercial N° 6"],
   "Civil": ["Juzgado Civil y Comercial N° 1 - Posadas","Juzgado Civil y Comercial N° 2 - Posadas","Juzgado Civil y Comercial N° 3 - Posadas","Juzgado Civil y Comercial N° 4 - Posadas","Juzgado Civil y Comercial N° 5 - Posadas","Juzgado Civil y Comercial N° 6 - Posadas","Juzgado Civil y Comercial N° 7 - Posadas","Juzgado Civil y Comercial N° 8 - Posadas","... Civil Comercial Laboral Familia y Violencia Fliar- Apostoles"],
   "Penal": ["Juzgado de Instrucción N° 1 - Posadas","Juzgado de Instrucción N° 2 - Posadas","Juzgado de Instrucción N° 3 - Posadas","Juzgado de Instrucción N° 6 - Posadas","Juzgado de Instrucción N° 7 - Posadas","Juzgado Correccional y de Menores N° 1 - Posadas","Juzgado Correccional y de Menores N° 2 - Posadas","Tribunal Penal N° 1 - Posadas","Tribunal Penal N° 2 - Posadas"],
   "Laboral": ["Juzgado Laboral N° 1 - Posadas","Juzgado Laboral N° 2 - Posadas","Juzgado Laboral N° 3 - Posadas","Juzgado Laboral N° 4 - Posadas"],
@@ -441,7 +442,9 @@ function renderTabla() {
 
 function formatearFecha(fechaString) {
   if(!fechaString) return '';
-  const fecha = new Date(fechaString);
+  // CORRECCIÓN: Agregar una hora para forzar que el objeto Date se cree en el huso horario local
+  // y evitar el desplazamiento al día anterior debido a la interpretación UTC de la fecha YYYY-MM-DD.
+  const fecha = new Date(fechaString + 'T12:00:00'); 
   if(isNaN(fecha.getTime())) return fechaString;
   return fecha.toLocaleDateString('es-AR');
 }
