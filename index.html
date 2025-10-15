@@ -377,7 +377,9 @@ async function cargarDatos() {
     notificaciones = querySnapshot.docs.map(d => ({id: d.id, ...d.data()}));
     
     // Ordenar por fecha (más recientes primero)
-    notificaciones.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+    // Se añade 'T12:00:00' para forzar la interpretación como la fecha local y asegurar el ordenamiento correcto
+    // en lugar de depender de la interpretación UTC por defecto de solo la fecha (YYYY-MM-DD).
+    notificaciones.sort((a, b) => new Date(b.fecha + 'T12:00:00') - new Date(a.fecha + 'T12:00:00'));
     
     aplicarFiltros();
   } catch(error) {
